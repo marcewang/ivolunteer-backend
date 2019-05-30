@@ -62,27 +62,27 @@ app.get('/opportunities/:city/:date', (req, res) => {
 }
 )
 
-app.get('/myaccount/:email' , (req,res)=> {
-    const {email} = req.params
+app.get('/myaccount/:email', (req, res) => {
+    const { email } = req.params
     db('users')
-    .join('user_opportunities', 'users.id','user_opportunities.volunteer_id')
-    .join('volunteer_opportunities', 'opportunity_id','volunteer_opportunities.id')
-    .returning('*')
-    .where('email', email)
-    .then(accountdetails => {
-        res.json(accountdetails)
-    })
-    .then(console.log)
-    .catch(err => res.status(400).json(err))
+        .join('user_opportunities', 'users.id', 'user_opportunities.volunteer_id')
+        .join('volunteer_opportunities', 'opportunity_id', 'volunteer_opportunities.id')
+        .returning('*')
+        .where('email', email)
+        .then(accountdetails => {
+            res.json(accountdetails)
+        })
+        .then(console.log)
+        .catch(err => res.status(400).json(err))
 })
 
-app.get('/user/:email' , (req,res)=> {
-    const {email} = req.params
+app.get('/user/:email', (req, res) => {
+    const { email } = req.params
     db.select('*')
-    .from('users')
-    .where('email', email)
-    .then(userInfo =>{res.json(userInfo) })
-    .catch(err => res.status(400).json(err))
+        .from('users')
+        .where('email', email)
+        .then(userInfo => { res.json(userInfo) })
+        .catch(err => res.status(400).json(err))
 })
 
 app.post('/register', (req, res) => {
@@ -131,27 +131,27 @@ app.post('/signin', (req, res) => {
         })
 })
 
-app.post('/signup',(req,res)=> {
-    const {email,id} = req.body
-    db.transaction(trx =>{
+app.post('/signup', (req, res) => {
+    const { email, id } = req.body
+    db.transaction(trx => {
         trx.select('id')
-        .from('users')
-        .where('email', email)
-        .then(userId => {
-            return trx.insert(
-                {
-                    volunteer_id: userId[0].id,
-                    opportunity_id: id                   
-                }
-            )
-            .into('user_opportunities')
-            .returning('*')
-            .then(user_opportunity => {
-                res.json(user_opportunity)
-            })
-            .then(trx.commit)
-            .then(trx.rollback)
-        }).catch(err => res.status(400).json(err))
+            .from('users')
+            .where('email', email)
+            .then(userId => {
+                return trx.insert(
+                    {
+                        volunteer_id: userId[0].id,
+                        opportunity_id: id
+                    }
+                )
+                    .into('user_opportunities')
+                    .returning('*')
+                    .then(user_opportunity => {
+                        res.json(user_opportunity)
+                    })
+                    .then(trx.commit)
+                    .then(trx.rollback)
+            }).catch(err => res.status(400).json(err))
     })
 })
 
@@ -170,7 +170,7 @@ app.post('/description', (req, res) => {
 //--------------------------------------------------------------------------------------------------------------------
 //COMPANIES ROUTES
 //---------------------------------------------------------------------------------------------------------------------
-app.post('/registerco', (req,res)=>{
+app.post('/registerco', (req, res) => {
     const { name, email, password, phone, logo, location, city, website } = req.body
     if (!name || !email || !password || !phone || !logo || !location || !city || !website) {
         return res.status(400).json('incorrect form submission') //need to return otherwise the rest of the stuff will still run.. so the user is still registered
@@ -178,19 +178,19 @@ app.post('/registerco', (req,res)=>{
     let hash = bcrypt.hashSync(password, 10)
     db.transaction(trx => {
         trx.insert({
-            co_email: email, 
+            co_email: email,
             co_pass: hash
         })
             .into('co_login')
             .returning('co_email')
             .then(loginEmail => {
                 return trx('companies').insert({
-                    co_name: name, 
+                    co_name: name,
                     co_email: loginEmail[0],
                     co_phone: phone,
                     co_logo: logo,
                     co_location: location,
-                    co_city: city, 
+                    co_city: city,
                     co_website: website
                 })
                     .returning('*')
@@ -222,43 +222,45 @@ app.post('/signinco', (req, res) => {
 })
 
 
-app.get('/userco/:email' , (req,res)=> {
-    const {email} = req.params
+app.get('/userco/:email', (req, res) => {
+    const { email } = req.params
     db.select('*')
-    .from('companies')
-    .where('co_email', email)
-    .then(userInfo =>{res.json(userInfo) })
-    .catch(err => res.status(400).json(err))
+        .from('companies')
+        .where('co_email', email)
+        .then(userInfo => { res.json(userInfo) })
+        .catch(err => res.status(400).json(err))
 })
 
-app.get('/accountco/:email' , (req,res)=> {
-    const {email} = req.params
+app.get('/accountco/:email', (req, res) => {
+    const { email } = req.params
     db.select('*')
-    .from('volunteer_opportunities')
-    .where('co_email', email)
-    .then(userInfo =>{res.send(userInfo) })
-    .catch(err => res.status(400).json(err))
+        .from('volunteer_opportunities')
+        .where('co_email', email)
+        .then(userInfo => { res.send(userInfo) })
+        .catch(err => res.status(400).json(err))
 })
 
-app.post('/postopportunity', (req,res) =>{
-    const{logo, date, start_time, end_time , location, city, phone,email, website, title, description }= req.body
+app.post('/postopportunity', (req, res) => {
+    const { logo, date, start_time, end_time, location, city, phone, email, website, title, description } = req.body
+    let parsedCityArray = city.toLowerCase().split("")
+    parsedCityArray[0] = parsedCityArray[0].toUpperCase()
     db('volunteer_opportunities')
-    .insert({
-        co_logo: logo,
-        vol_date: date,
-        vol_start_time:start_time,
-        vol_end_time: end_time,
-        vol_location:location,
-        vol_city: city,
-        co_phone:phone,
-        co_email:email,
-        co_website: website,
-        vol_title: title,
-        vol_description: description
-    })
-    .returning('*')
-    .then(opportunity => res.json(opportunity))
-    .catch(err => res.status(400).json(err))
+        .insert({
+            co_logo: logo,
+            vol_date: date,
+            vol_start_time: start_time,
+            vol_end_time: end_time,
+            vol_location: location,
+            vol_city: parsedCityArray.join(""),
+            co_phone: phone,
+            co_email: email,
+            co_website: website,
+            vol_title: title,
+            vol_description: description
+        })
+        .returning('*')
+        .then(opportunity => res.json(opportunity))
+        .catch(err => res.status(400).json(err))
 })
 
 
