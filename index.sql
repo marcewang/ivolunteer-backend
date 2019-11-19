@@ -81,7 +81,6 @@ Our Mission: Empowering Families to Stay Together  Our Vision: Closer to
 ')
 
 
-***************************************************************************************************************************
 CREATE TABLE co_login (
     id serial PRIMARY KEY,
     co_email text UNIQUE NOT NULL,
