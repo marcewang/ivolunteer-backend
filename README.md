@@ -9,5 +9,17 @@ This website was designed having in mind that sometimes people have suddently a 
 ## Installation steps: 
 - Clone repository 
 - run "npm install"
-- Using PostgreSQL run contents of "index.sql"
+- Using PostgreSQL run contents of "index.sql". 
+- Customize "server.js" 
+
+const db = knex({
+    client: 'pg',
+    connection: {
+        host: '127.0.0.1',
+        user: 'xxx
+        password: xxx
+        database: xxx
+    }
+});
+
 - run "npm start"
