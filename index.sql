@@ -1,4 +1,4 @@
-CREATE TABLE user (
+CREATE TABLE users (
     id serial PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email text UNIQUE NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE user_opportunities(
 
 INSERT INTO volunteer_opportunities (co_logo, vol_date,vol_start_time,vol_end_time,vol_location, vol_city,co_phone, co_email,co_website,vol_title,vol_description)
 VALUES ('https://www.propellus.org/content/propellus/volunteer/organization-profile/logo/Community-Future%20logo-variants/160w_thumb/Community-Future%20logo.JPG',
-'13-06-2019',
+'2019-06-13',
 '10:00:00',
 '15:00:00',
 '1111 - 11 Avenue SW, Calgary, AB, T2R 0G5',
